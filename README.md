@@ -42,11 +42,42 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
 
 ## Deploy
 
-Deploy to [Vercel](https://vercel.com) (or any host that supports Next.js API routes):
+Deploy to [Vercel](https://vercel.com) (or any host that supports Next.js API routes).
 
-1. Connect this repo to Vercel.
-2. Set env vars: `GITHUB_REPO`, `GITHUB_PATH`, `GITHUB_BRANCH` (and optionally `GITHUB_TOKEN`).
-3. Deploy. New `.usdz` files pushed to GitHub show up on the next load (listing uses the GitHub API).
+**[Deploy with Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhamzashaebi%2FsharingAR)** — one-click: connects this repo, then follow steps 2–3 below.
+
+### 1. Connect this repo to Vercel
+
+- Go to [vercel.com](https://vercel.com) and sign in (use “Continue with GitHub” if you want the repo linked to your GitHub account).
+- Click **Add New…** then **Project**.
+- Under “Import Git Repository”, find **sharingAR** (or paste `hamzashaebi/sharingAR` / your fork’s full name). If it’s missing, click **Adjust GitHub App Permissions** and grant Vercel access to the repo, then refresh.
+- Select the **sharingAR** repo and click **Import** (do not change Framework Preset or Root Directory unless you use a monorepo).
+
+### 2. Set environment variables
+
+Before or right after the first deploy:
+
+- In the project import screen, expand **Environment Variables**.
+- Add these (for Production, and optionally Preview/Development if you want the same config everywhere):
+
+| Name | Value | Notes |
+|------|--------|-------|
+| `GITHUB_REPO` | `hamzashaebi/sharingAR` | Use `owner/repo` for your fork if different. |
+| `GITHUB_PATH` | `models` | Path inside the repo where .usdz files live. |
+| `GITHUB_BRANCH` | `main` | Branch used for raw file URLs. |
+| `GITHUB_TOKEN` | *(optional)* | Only if you need higher GitHub API rate limits; create a fine-grained or classic token with `contents: read`. |
+
+If you add or change env vars after the first deploy, trigger a new deploy (step 3) so they take effect.
+
+### 3. Deploy
+
+- Click **Deploy** (first time) or **Redeploy** (after changing env vars) from the project dashboard.
+- Wait for the build to finish. Vercel will show a **Production** URL (e.g. `https://sharing-ar-xxx.vercel.app`).
+- Open that URL: you should see the Sharing AR listing page. With no .usdz in `models/` you’ll see “No .usdz files in the models folder yet.” Add .usdz files to `models/`, push to GitHub; the list updates on the next page load (listing uses the GitHub API).
+
+### Optional: custom domain
+
+In the project: **Settings → Domains** → add your domain and follow Vercel’s DNS instructions.
 
 ## Requirements
 
