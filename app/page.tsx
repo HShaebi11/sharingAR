@@ -1,8 +1,4 @@
 import ModelCard from "./ModelCard";
-import {
-  isCloudStorageConfigured,
-  listUsdzFromCloudStorage,
-} from "@/lib/cloud-storage";
 
 const GITHUB_API = "https://api.github.com";
 
@@ -52,27 +48,17 @@ async function listUsdzFromGitHub(subpath: string): Promise<string[]> {
 export default async function Home() {
   const { repo } = getGitHubConfig();
   const repoUrl = `https://github.com/${repo}`;
-  const useCloudStorage = isCloudStorageConfigured();
   let error: string | null = null;
   const privateFiles: string[] = [];
   const publicFiles: string[] = [];
 
   try {
-    if (useCloudStorage) {
-      const [privateList, publicList] = await Promise.all([
-        listUsdzFromCloudStorage("private"),
-        listUsdzFromCloudStorage("public"),
-      ]);
-      privateFiles.push(...privateList);
-      publicFiles.push(...publicList);
-    } else {
-      const [privateList, publicList] = await Promise.all([
-        listUsdzFromGitHub("private"),
-        listUsdzFromGitHub("public"),
-      ]);
-      privateFiles.push(...privateList);
-      publicFiles.push(...publicList);
-    }
+    const [privateList, publicList] = await Promise.all([
+      listUsdzFromGitHub("private"),
+      listUsdzFromGitHub("public"),
+    ]);
+    privateFiles.push(...privateList);
+    publicFiles.push(...publicList);
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load models";
   }
@@ -82,9 +68,7 @@ export default async function Home() {
       <header className="header">
         <h1 className="title">Sharing AR</h1>
         <p className="subtitle">
-          {useCloudStorage
-            ? "Models loaded from cloud storage. Open on iOS Safari to view in AR."
-            : "Put .usdz files in models/private or models/public (public = shareable link). Open on iOS Safari to view in AR."}
+          Put .usdz files in models/private or models/public (public = shareable link). Open on iOS Safari to view in AR.
         </p>
       </header>
 
@@ -99,9 +83,7 @@ export default async function Home() {
         <p className="folder-desc">View in AR only; no share link.</p>
         {privateFiles.length === 0 ? (
           <p className="empty">
-            {useCloudStorage
-              ? "No .usdz files in private folder yet."
-              : <>No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/private</code></a> in your repo and add .usdz files.</>}
+            No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/private</code></a> in your repo and add .usdz files.
           </p>
         ) : (
           <ul className="grid">
@@ -123,9 +105,7 @@ export default async function Home() {
         <p className="folder-desc">Shareable link with Copy link.</p>
         {publicFiles.length === 0 ? (
           <p className="empty">
-            {useCloudStorage
-              ? "No .usdz files in public folder yet."
-              : <>No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/public</code></a> in your repo and add .usdz files.</>}
+            No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/public</code></a> in your repo and add .usdz files.
           </p>
         ) : (
           <ul className="grid">

@@ -19,29 +19,7 @@ To create the folders: in your repo add a file at `models/private/.gitkeep` and 
 
 The app uses a small proxy so USDZ files are served with the correct MIME type (`model/vnd.usdz+zip`) required by Safari for AR Quick Look. GitHub’s raw URLs don’t send that header, so the proxy fetches from GitHub and re-serves the file with the right `Content-Type`.
 
-### Cloudflare R2 (S3 API)
 
-You can use **Cloudflare R2** (or any S3-compatible storage) instead of GitHub. When the R2 env vars are set, the app lists and serves `.usdz` files from your bucket.
-
-1. **Create an R2 bucket** in the [Cloudflare dashboard](https://dash.cloudflare.com) → R2 → Create bucket.
-2. **Create S3 API credentials**: R2 → **Manage R2 API Tokens** → Create API token. Grant **Object Read & Write** for your bucket (or all buckets). Copy the **Access Key ID** and **Secret Access Key**.
-3. **Account ID**: In the R2 dashboard, your **Account ID** is in the right-hand sidebar (under “Account ID”). The S3 API endpoint is `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
-4. **Bucket layout**: In the bucket, use the same structure as GitHub. With default `CLOUD_STORAGE_PATH=models`, put `.usdz` files in:
-   - `models/private/` → Private section (view only, no share link)
-   - `models/public/` → Public section (shareable link)
-
-Add to `.env.local` (see `.env.example`):
-
-| Variable | Value |
-|----------|--------|
-| `CLOUD_STORAGE_BUCKET` | Your R2 bucket name |
-| `CLOUD_STORAGE_ACCESS_KEY_ID` | From “Manage R2 API Tokens” |
-| `CLOUD_STORAGE_SECRET_ACCESS_KEY` | From “Manage R2 API Tokens” |
-| `CLOUD_STORAGE_REGION` | `auto` |
-| `CLOUD_STORAGE_ENDPOINT` | `https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com` |
-| `CLOUD_STORAGE_PATH` | `models` (optional; default) |
-
-On Vercel, add the same variables in **Project → Settings → Environment Variables**.
 
 ## Setup
 
@@ -63,7 +41,6 @@ On Vercel, add the same variables in **Project → Settings → Environment Vari
    - `GITHUB_PATH` – path inside the repo where `.usdz` files live (default: `models`)
    - `GITHUB_BRANCH` – branch for raw file URLs (default: `main`)
    - `GITHUB_TOKEN` – optional; use for higher GitHub API rate limits
-   - **Cloud storage**: optional; see `.env.example` for `CLOUD_STORAGE_*` vars. When set, models are loaded from the bucket instead of GitHub.
 
 3. Run locally:
 

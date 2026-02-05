@@ -1,7 +1,3 @@
-import {
-  getObjectFromCloudStorage,
-  isCloudStorageConfigured,
-} from "@/lib/cloud-storage";
 import { NextRequest, NextResponse } from "next/server";
 
 const USDZ_MIME = "model/vnd.usdz+zip";
@@ -24,21 +20,6 @@ export async function GET(
       { error: "Invalid or missing .usdz path" },
       { status: 400 }
     );
-  }
-
-  if (isCloudStorageConfigured()) {
-    try {
-      const { body, contentLength } = await getObjectFromCloudStorage(filename);
-      const headers = new Headers({
-        "Content-Type": USDZ_MIME,
-        "Cache-Control": "public, max-age=3600",
-      });
-      if (contentLength != null) headers.set("Content-Length", String(contentLength));
-      return new NextResponse(body, { status: 200, headers });
-    } catch (err) {
-      console.error("Cloud storage fetch error:", err);
-      return new NextResponse("Not found", { status: 404 });
-    }
   }
 
   const { repo, path: repoPath, branch } = getGitHubConfig();
