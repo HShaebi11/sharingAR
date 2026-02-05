@@ -27,7 +27,16 @@ async function listUsdzFiles(): Promise<string[]> {
   });
 
   if (!res.ok) {
-    if (res.status === 404) return [];
+    if (res.status === 404) {
+      throw new Error(
+        `Repository or path not found. Check GITHUB_REPO and GITHUB_PATH in Vercel, then redeploy. Tried: ${repo}, ${path}`
+      );
+    }
+    if (res.status === 403) {
+      throw new Error(
+        "Access denied. If the repo is private, add GITHUB_TOKEN in Vercel."
+      );
+    }
     throw new Error(`GitHub API error: ${res.status}`);
   }
 
