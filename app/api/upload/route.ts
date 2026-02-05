@@ -27,11 +27,11 @@ export async function POST(request: Request): Promise<NextResponse> {
 
                 const folder = payload?.folder === "public" ? "public" : "private";
 
-                // Enforce the requested path structure: view-byhamza-xyz/models/{folder}/{filename}
+                // Enforce the requested path structure: viewStroage/models/{folder}/{filename}
                 const filename = pathname.split("/").pop();
                 if (!filename) throw new Error("Invalid filename");
 
-                const expectedPath = `view-byhamza-xyz/models/${folder}/${filename}`;
+                const expectedPath = `viewStroage/models/${folder}/${filename}`;
 
                 if (pathname !== expectedPath) {
                     throw new Error(`Invalid path. Expected: ${expectedPath}, Got: ${pathname}`);

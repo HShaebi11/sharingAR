@@ -37,7 +37,7 @@ async function syncFolder(subDir) {
     const files = fs.readdirSync(folderPath);
     for (const file of files) {
         if (file.toLowerCase().endsWith('.usdz')) {
-            const pathname = `view-byhamza-xyz/models/${subDir}/${file}`;
+            const pathname = `viewStroage/models/${subDir}/${file}`;
             console.log(`Syncing ${pathname}...`);
             await uploadFile(path.join(folderPath, file), pathname);
         }

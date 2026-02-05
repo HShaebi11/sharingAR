@@ -20,7 +20,7 @@ export default function UploadComponent() {
         try {
             // Client-side upload
             // We must specify the full path here so it lands in the right folder
-            const pathname = `view-byhamza-xyz/models/${folder}/${file.name}`;
+            const pathname = `viewStroage/models/${folder}/${file.name}`;
 
             const newBlob = await upload(pathname, file, {
                 access: "public",
@@ -107,7 +107,7 @@ export default function UploadComponent() {
                         {file && (
                             <p className="path-preview">
                                 Destination: <br />
-                                <code>view-byhamza-xyz/models/{folder}/{file.name}</code>
+                                <code>viewStroage/models/{folder}/{file.name}</code>
                             </p>
                         )}
                     </div>

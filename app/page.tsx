@@ -11,8 +11,8 @@ export default async function Home() {
 
   try {
     const [privateList, publicList] = await Promise.all([
-      listModelsBlob("models/private"),
-      listModelsBlob("models/public"),
+      listModelsBlob("private"), // lists viewStroage/private
+      listModelsBlob("public"),  // lists viewStroage/public
     ]);
     privateFiles.push(...privateList);
     publicFiles.push(...publicList);
@@ -43,8 +43,7 @@ export default async function Home() {
         <h2 className="folder-title">Private</h2>
         <p className="folder-desc">View in AR only; no share link.</p>
         {privateFiles.length === 0 ? (
-          <p className="empty">
-            No .usdz files yet. Upload .usdz files to <code>view-byhamza-xyz/models/private/</code> in your Vercel Blob store.
+            No .usdz files yet. Upload .usdz files to <code>viewStroage/models/private/</code> in your Vercel Blob store.
           </p>
         ) : (
           <ul className="grid">
@@ -65,23 +64,23 @@ export default async function Home() {
         <h2 className="folder-title">Public</h2>
         <p className="folder-desc">Shareable link with Copy link.</p>
         {publicFiles.length === 0 ? (
-          <p className="empty">
-            No .usdz files yet. Upload .usdz files to <code>view-byhamza-xyz/models/public/</code> in your Vercel Blob store.
+            No .usdz files yet. Upload .usdz files to <code>viewStroage/models/public/</code> in your Vercel Blob store.
           </p>
-        ) : (
-          <ul className="grid">
-            {publicFiles.map((item) => (
-              <li key={item.name}>
-                <ModelCard
-                  name={item.name.split("/").pop() || item.name}
-                  proxyUrl={`/api/ar/${item.name}`}
-                  showCopyLink={true}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    </main>
+  ) : (
+    <ul className="grid">
+      {publicFiles.map((item) => (
+        <li key={item.name}>
+          <ModelCard
+            name={item.name.split("/").pop() || item.name}
+            proxyUrl={`/api/ar/${item.name}`}
+            showCopyLink={true}
+          />
+        </li>
+      ))}
+    </ul>
+  )
+}
+      </section >
+    </main >
   );
 }
