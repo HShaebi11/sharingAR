@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import ModelView from "../../ModelView";
 
 type Props = { params: Promise<{ path: string[] }> };
@@ -33,9 +32,6 @@ export default async function ModelPage({ params }: Props) {
   return (
     <main className="main model-page">
       <header className="header">
-        <p className="back-link">
-          <Link href="/">← All models</Link>
-        </p>
         <h1 className="title">{displayName}</h1>
         <p className="subtitle">Open on iOS Safari to view in AR.</p>
       </header>

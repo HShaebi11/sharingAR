@@ -145,17 +145,6 @@ a {
 .model-page .header {
   margin-bottom: 1.5rem;
 }
-.back-link {
-  margin-bottom: 0.75rem;
-  font-size: 0.875rem;
-}
-.back-link a {
-  color: #a1a1aa;
-}
-.back-link a:hover {
-  color: #e4e4e7;
-  text-decoration: underline;
-}
 
 .model-view {
   display: flex;
