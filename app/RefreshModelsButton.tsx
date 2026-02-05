@@ -6,24 +6,43 @@ import { useState } from "react";
 export default function RefreshModelsButton() {
   const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleClick() {
+  async function handleClick() {
     if (isRefreshing) return;
     setIsRefreshing(true);
-    router.refresh();
-    // Reset loading state after a short delay so user sees feedback
-    setTimeout(() => setIsRefreshing(false), 1500);
+    setError(null);
+    try {
+      const res = await fetch("/api/commit-models", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Failed to commit and push.");
+        return;
+      }
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to commit.");
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
   }
 
   return (
-    <button
-      type="button"
-      className="refresh-models-btn"
-      onClick={handleClick}
-      disabled={isRefreshing}
-      aria-label={isRefreshing ? "Refreshing…" : "Refresh model list"}
-    >
-      {isRefreshing ? "Refreshing…" : "Refresh"}
-    </button>
+    <div className="refresh-models-wrap">
+      <button
+        type="button"
+        className="refresh-models-btn"
+        onClick={handleClick}
+        disabled={isRefreshing}
+        aria-label={isRefreshing ? "Committing and refreshing…" : "Commit new changes and refresh model list"}
+      >
+        {isRefreshing ? "Committing…" : "Refresh"}
+      </button>
+      {error && (
+        <p className="refresh-models-error" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

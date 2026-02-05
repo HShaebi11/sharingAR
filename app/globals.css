@@ -50,7 +50,6 @@ a {
 
 .refresh-models-btn {
   display: inline-block;
-  margin-top: 1rem;
   font: inherit;
   font-size: 0.9375rem;
   color: #a1a1aa;
@@ -70,6 +69,16 @@ a {
 .refresh-models-btn:disabled {
   cursor: not-allowed;
   opacity: 0.8;
+}
+
+.refresh-models-wrap {
+  margin-top: 1rem;
+}
+
+.refresh-models-error {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #fca5a5;
 }
 
 .error {
