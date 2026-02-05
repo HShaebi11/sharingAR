@@ -1,4 +1,5 @@
 import ModelCard from "./ModelCard";
+import UploadForm from "./UploadForm";
 
 const GITHUB_API = "https://api.github.com";
 const FOLDERS = ["private", "public"] as const;
@@ -80,6 +81,8 @@ export default async function Home() {
           {error}
         </div>
       )}
+
+      <UploadForm />
 
       <section className="folder-section">
         <h2 className="folder-title">Private</h2>

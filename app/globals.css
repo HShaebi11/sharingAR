@@ -56,6 +56,117 @@ a {
   margin-bottom: 1.5rem;
 }
 
+.upload-section {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+.upload-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.upload-desc {
+  color: #71717a;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+.upload-desc code {
+  background: #27272a;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+.upload-label-text {
+  font-size: 0.8125rem;
+  color: #a1a1aa;
+}
+.upload-input {
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 0.375rem;
+  color: inherit;
+  max-width: 100%;
+}
+.upload-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.upload-folder {
+  min-width: 12rem;
+}
+.upload-select {
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 0.375rem;
+  color: inherit;
+  cursor: pointer;
+}
+.upload-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.upload-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.upload-btn {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #0f0f12;
+  background: #e4e4e7;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.upload-btn:hover:not(:disabled) {
+  background: #fafafa;
+}
+.upload-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.upload-filename {
+  font-size: 0.8125rem;
+  color: #a1a1aa;
+  margin: 0;
+}
+.upload-message {
+  font-size: 0.875rem;
+  margin: 0;
+}
+.upload-message-success {
+  color: #86efac;
+}
+.upload-message-error {
+  color: #fca5a5;
+}
+
 .empty {
   color: #71717a;
   font-size: 0.9375rem;
