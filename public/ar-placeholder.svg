@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
+  <rect width="120" height="120" rx="12" fill="#27272a"/>
+  <path d="M30 50 L60 30 L90 50 L90 80 L60 100 L30 80 Z" stroke="#a1a1aa" stroke-width="2" fill="none"/>
+  <text x="60" y="70" text-anchor="middle" fill="#a1a1aa" font-size="12" font-family="system-ui,sans-serif">AR</text>
+</svg>
