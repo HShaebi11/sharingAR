@@ -1,5 +1,6 @@
 import ModelCard from "./ModelCard";
 import { listModelsBlob, ModelItem } from "@/lib/storage-blob";
+import UploadComponent from "./components/UploadComponent";
 
 export default async function Home() {
   const repoUrl = "#";
@@ -23,10 +24,13 @@ export default async function Home() {
   return (
     <main className="main">
       <header className="header">
-        <h1 className="title">Sharing AR</h1>
-        <p className="subtitle">
-          Put .usdz files in models/private or models/public (public = shareable link). Open on iOS Safari to view in AR.
-        </p>
+        <div>
+          <h1 className="title">Sharing AR</h1>
+          <p className="subtitle">
+            Put .usdz files in models/private or models/public (public = shareable link). Open on iOS Safari to view in AR.
+          </p>
+        </div>
+        <UploadComponent />
       </header>
 
       {error && (
