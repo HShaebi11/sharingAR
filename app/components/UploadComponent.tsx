@@ -19,10 +19,13 @@ export default function UploadComponent() {
         setIsUploading(true);
         try {
             // Client-side upload
-            const newBlob = await upload(file.name, file, {
+            // We must specify the full path here so it lands in the right folder
+            const pathname = `view-byhamza-xyz/models/${folder}/${file.name}`;
+
+            const newBlob = await upload(pathname, file, {
                 access: "public",
                 handleUploadUrl: "/api/upload",
-                clientPayload: JSON.stringify({ folder }), // Send folder info to server for path construction
+                clientPayload: JSON.stringify({ folder }), // check server validation using this
             });
 
             console.log("Uploaded:", newBlob.url);
