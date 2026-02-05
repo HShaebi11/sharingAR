@@ -27,7 +27,10 @@ export function createS3Storage(): StorageProvider {
 
   const client = new S3Client({
     region,
-    ...(endpoint && { endpoint }),
+    ...(endpoint && {
+      endpoint,
+      forcePathStyle: true, // required for Cloudflare R2 and other S3-compatible custom endpoints
+    }),
     ...(accessKeyId && secretAccessKey
       ? { credentials: { accessKeyId, secretAccessKey } }
       : {}),

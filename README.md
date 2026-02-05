@@ -21,15 +21,41 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
 
 ### Cloud storage (S3-compatible)
 
-On the **`feature/cloud-storage`** branch you can use **S3-compatible** storage (AWS S3, Cloudflare R2, MinIO) instead of GitHub. Set `STORAGE_PROVIDER=s3` and configure your bucket:
+On the **`feature/cloud-storage`** branch you can use **S3-compatible** storage (AWS S3, Cloudflare R2, MinIO) instead of GitHub. Set `STORAGE_PROVIDER=s3` and configure your bucket.
+
+#### Cloudflare R2 (S3 API)
+
+1. **Create an R2 bucket** in the [Cloudflare dashboard](https://dash.cloudflare.com) → R2 → Create bucket.
+2. **Create S3 API credentials**: R2 → **Manage R2 API Tokens** → Create API token. Grant **Object Read & Write** for your bucket (or all buckets). Copy the **Access Key ID** and **Secret Access Key**.
+3. **Account ID**: In the R2 dashboard, your **Account ID** is in the right-hand sidebar. The S3 API endpoint is `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`.
+4. **Bucket layout**: Put `.usdz` files under `<S3_PREFIX>/private/` and `<S3_PREFIX>/public/`. For example with `S3_PREFIX=view-byhamza-xyz/models`:
+   - `view-byhamza-xyz/models/private/` → Private section (view only, no share link)
+   - `view-byhamza-xyz/models/public/` → Public section (shareable link)  
+   Default prefix is `models` if `S3_PREFIX` is not set.
+
+Add to `.env.local`:
+
+| Variable | Value |
+|----------|--------|
+| `STORAGE_PROVIDER` | `s3` |
+| `S3_BUCKET` | Your R2 bucket name |
+| `S3_ACCESS_KEY_ID` | From “Manage R2 API Tokens” |
+| `S3_SECRET_ACCESS_KEY` | From “Manage R2 API Tokens” |
+| `S3_REGION` | `auto` |
+| `S3_ENDPOINT` | `https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com` |
+| `S3_PREFIX` | e.g. `view-byhamza-xyz/models` or `models` (optional; default: `models`) |
+
+On Vercel, add the same variables in **Project → Settings → Environment Variables**.
+
+#### Other S3-compatible (AWS S3, MinIO)
 
 | Env var | Description |
 |--------|-------------|
 | `S3_BUCKET` | Bucket name (required when using S3). |
-| `S3_PREFIX` | Key prefix for .usdz files (default: `models`). Put files under `models/private/` and `models/public/`. |
-| `S3_REGION` | AWS region (default: `auto`; use for R2). |
-| `S3_ENDPOINT` | Custom endpoint (e.g. R2: `https://<account>.r2.cloudflarestorage.com`). |
-| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Credentials (omit for public buckets with IAM/instance role). |
+| `S3_PREFIX` | Key prefix for .usdz files (default: `models`). Put files under `<prefix>/private/` and `<prefix>/public/` (e.g. `view-byhamza-xyz/models`). |
+| `S3_REGION` | AWS region (e.g. `us-east-1` for AWS; `auto` for R2). |
+| `S3_ENDPOINT` | Custom endpoint (R2: `https://<account>.r2.cloudflarestorage.com`; omit for AWS S3). |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Credentials (required for R2; use IAM/instance role for AWS when possible). |
 
 Listing and file serving use the same Private/Public behaviour; only the backend (GitHub vs S3) changes.
 
