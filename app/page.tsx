@@ -19,27 +19,6 @@ async function listUsdzFiles(): Promise<string[]> {
   const { repo, path } = getConfig();
   const token = process.env.GITHUB_TOKEN;
   const url = `${GITHUB_API}/repos/${repo}/contents/${path}`;
-  // #region agent log
-  fetch("http://127.0.0.1:7247/ingest/3472bf24-0680-40cd-92fd-96d67b4de365", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "app/page.tsx:listUsdzFiles",
-      message: "GitHub list request",
-      data: {
-        repo,
-        path,
-        url,
-        hasToken: !!token,
-        repoFromEnv: !!process.env.GITHUB_REPO,
-        pathFromEnv: !!process.env.GITHUB_PATH,
-      },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      hypothesisId: "A",
-    }),
-  }).catch(() => {});
-  // #endregion
   const res = await fetch(url, {
     next: { revalidate: 60 },
     headers: token
@@ -48,27 +27,6 @@ async function listUsdzFiles(): Promise<string[]> {
   });
 
   if (!res.ok) {
-    const bodyText = await res.text();
-    // #region agent log
-    fetch("http://127.0.0.1:7247/ingest/3472bf24-0680-40cd-92fd-96d67b4de365", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        location: "app/page.tsx:listUsdzFiles",
-        message: "GitHub API error response",
-        data: {
-          status: res.status,
-          statusText: res.statusText,
-          bodySnippet: bodyText.slice(0, 500),
-          repo,
-          path,
-        },
-        timestamp: Date.now(),
-        sessionId: "debug-session",
-        hypothesisId: "B,C,E",
-      }),
-    }).catch(() => {});
-    // #endregion
     if (res.status === 404) {
       throw new Error(
         `Repository or path not found (GitHub 404). Tried: ${repo}, ${path}. ` +
@@ -87,25 +45,10 @@ async function listUsdzFiles(): Promise<string[]> {
   const data = (await res.json()) as GitHubContentItem[];
   if (!Array.isArray(data)) return [];
 
-  const files = data
+  return data
     .filter((item) => item.type === "file" && item.name.toLowerCase().endsWith(".usdz"))
     .map((item) => item.name)
     .sort();
-  // #region agent log
-  fetch("http://127.0.0.1:7247/ingest/3472bf24-0680-40cd-92fd-96d67b4de365", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "app/page.tsx:listUsdzFiles",
-      message: "GitHub list success",
-      data: { repo, path, fileCount: files.length, fileNames: files },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      hypothesisId: "success",
-    }),
-  }).catch(() => {});
-  // #endregion
-  return files;
 }
 
 export default async function Home() {
