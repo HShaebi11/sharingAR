@@ -56,28 +56,15 @@ export default function ModelView({
 
   return (
     <div className="model-view">
-      <div className="model-viewer-wrap">
-        <model-viewer
-          src={proxyUrl}
-          ios-src={proxyUrl}
-          alt={displayName}
-          camera-controls
-          ar
-          ar-modes="webxr quick-look"
-          style={{ width: "100%", height: "100%", minHeight: "320px" }}
-        >
-          <button slot="ar-button" className="view-ar-btn">
-            View in AR
-          </button>
-        </model-viewer>
-      </div>
-      <div className="model-view-ar model-view-fallback">
+      <div className="model-view-ar">
         {supportsAR === true ? (
           <a rel="ar" href={proxyUrl} className="ar-link">
+            <img src={PLACEHOLDER_SRC} alt="View in AR" width={160} height={160} />
             <span className="ar-label">View in AR</span>
           </a>
         ) : (
           <a href={proxyUrl} download={fileName} className="download-link">
+            <img src={PLACEHOLDER_SRC} alt="3D model" width={160} height={160} />
             <span className="ar-label">
               {supportsAR === false ? "Download .usdz" : "Open / Download"}
             </span>

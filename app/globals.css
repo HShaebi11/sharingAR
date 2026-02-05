@@ -175,43 +175,6 @@ a {
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  width: 100%;
-}
-
-.model-viewer-wrap {
-  width: 100%;
-  max-width: 640px;
-  aspect-ratio: 1;
-  min-height: 320px;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  background: #18181b;
-  border: 1px solid #27272a;
-}
-.model-viewer-wrap model-viewer {
-  width: 100%;
-  height: 100%;
-  --poster-color: transparent;
-}
-
-.view-ar-btn {
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #0f0f12;
-  background: #fff;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-.view-ar-btn:hover {
-  background: #e4e4e7;
-}
-
-.model-view-fallback {
-  margin-top: 0;
 }
 .model-view-ar .ar-link,
 .model-view-ar .download-link {
