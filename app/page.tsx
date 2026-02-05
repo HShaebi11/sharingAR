@@ -1,9 +1,12 @@
 import ModelCard from "./ModelCard";
+import {
+  isCloudStorageConfigured,
+  listUsdzFromCloudStorage,
+} from "@/lib/cloud-storage";
 
 const GITHUB_API = "https://api.github.com";
-const FOLDERS = ["private", "public"] as const;
 
-function getConfig() {
+function getGitHubConfig() {
   const repo = process.env.GITHUB_REPO ?? "hamzashaebi/sharingAR";
   const path = process.env.GITHUB_PATH ?? "models";
   const branch = process.env.GITHUB_BRANCH ?? "main";
@@ -16,8 +19,8 @@ type GitHubContentItem = {
   path: string;
 };
 
-async function listUsdzFilesIn(subpath: string): Promise<string[]> {
-  const { repo, path } = getConfig();
+async function listUsdzFromGitHub(subpath: string): Promise<string[]> {
+  const { repo, path } = getGitHubConfig();
   const token = process.env.GITHUB_TOKEN;
   const url = `${GITHUB_API}/repos/${repo}/contents/${path}/${subpath}`;
   const res = await fetch(url, {
@@ -47,19 +50,29 @@ async function listUsdzFilesIn(subpath: string): Promise<string[]> {
 }
 
 export default async function Home() {
-  const { repo } = getConfig();
+  const { repo } = getGitHubConfig();
   const repoUrl = `https://github.com/${repo}`;
+  const useCloudStorage = isCloudStorageConfigured();
   let error: string | null = null;
   const privateFiles: string[] = [];
   const publicFiles: string[] = [];
 
   try {
-    const [privateList, publicList] = await Promise.all([
-      listUsdzFilesIn("private"),
-      listUsdzFilesIn("public"),
-    ]);
-    privateFiles.push(...privateList);
-    publicFiles.push(...publicList);
+    if (useCloudStorage) {
+      const [privateList, publicList] = await Promise.all([
+        listUsdzFromCloudStorage("private"),
+        listUsdzFromCloudStorage("public"),
+      ]);
+      privateFiles.push(...privateList);
+      publicFiles.push(...publicList);
+    } else {
+      const [privateList, publicList] = await Promise.all([
+        listUsdzFromGitHub("private"),
+        listUsdzFromGitHub("public"),
+      ]);
+      privateFiles.push(...privateList);
+      publicFiles.push(...publicList);
+    }
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load models";
   }
@@ -69,9 +82,9 @@ export default async function Home() {
       <header className="header">
         <h1 className="title">Sharing AR</h1>
         <p className="subtitle">
-          Put .usdz files in <code>models/private</code> or{" "}
-          <code>models/public</code> (public = shareable link). Open on iOS Safari
-          to view in AR.
+          {useCloudStorage
+            ? "Models loaded from cloud storage. Open on iOS Safari to view in AR."
+            : "Put .usdz files in models/private or models/public (public = shareable link). Open on iOS Safari to view in AR."}
         </p>
       </header>
 
@@ -86,11 +99,9 @@ export default async function Home() {
         <p className="folder-desc">View in AR only; no share link.</p>
         {privateFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet.{" "}
-            <a href={repoUrl} target="_blank" rel="noopener noreferrer">
-              Create <code>models/private</code>
-            </a>{" "}
-            in your repo and add .usdz files.
+            {useCloudStorage
+              ? "No .usdz files in private folder yet."
+              : <>No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/private</code></a> in your repo and add .usdz files.</>}
           </p>
         ) : (
           <ul className="grid">
@@ -112,11 +123,9 @@ export default async function Home() {
         <p className="folder-desc">Shareable link with Copy link.</p>
         {publicFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet.{" "}
-            <a href={repoUrl} target="_blank" rel="noopener noreferrer">
-              Create <code>models/public</code>
-            </a>{" "}
-            in your repo and add .usdz files.
+            {useCloudStorage
+              ? "No .usdz files in public folder yet."
+              : <>No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/public</code></a> in your repo and add .usdz files.</>}
           </p>
         ) : (
           <ul className="grid">

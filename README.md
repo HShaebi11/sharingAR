@@ -19,6 +19,16 @@ To create the folders: in your repo add a file at `models/private/.gitkeep` and 
 
 The app uses a small proxy so USDZ files are served with the correct MIME type (`model/vnd.usdz+zip`) required by Safari for AR Quick Look. GitHub’s raw URLs don’t send that header, so the proxy fetches from GitHub and re-serves the file with the right `Content-Type`.
 
+### Cloud storage (optional)
+
+You can use **S3-compatible** object storage (AWS S3, Cloudflare R2, MinIO) instead of GitHub. When `CLOUD_STORAGE_BUCKET`, `CLOUD_STORAGE_ACCESS_KEY_ID`, and `CLOUD_STORAGE_SECRET_ACCESS_KEY` are set, the app lists and serves `.usdz` files from your bucket.
+
+- **Bucket layout**: Use the same structure as GitHub: a prefix (default `models`) with `private/` and `public/` under it. Put `.usdz` files in `models/private/` and `models/public/` (or whatever prefix you set via `CLOUD_STORAGE_PATH`).
+- **Cloudflare R2**: Set `CLOUD_STORAGE_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com` and `CLOUD_STORAGE_REGION=auto`.
+- **AWS S3**: Omit `CLOUD_STORAGE_ENDPOINT` and set `CLOUD_STORAGE_REGION` to your bucket region (e.g. `us-east-1`).
+
+See `.env.example` for all cloud storage variables.
+
 ## Setup
 
 1. Clone the repo and install dependencies:
@@ -39,6 +49,7 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
    - `GITHUB_PATH` – path inside the repo where `.usdz` files live (default: `models`)
    - `GITHUB_BRANCH` – branch for raw file URLs (default: `main`)
    - `GITHUB_TOKEN` – optional; use for higher GitHub API rate limits
+   - **Cloud storage**: optional; see `.env.example` for `CLOUD_STORAGE_*` vars. When set, models are loaded from the bucket instead of GitHub.
 
 3. Run locally:
 

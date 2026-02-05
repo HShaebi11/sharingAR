@@ -1,8 +1,12 @@
+import {
+  getObjectFromCloudStorage,
+  isCloudStorageConfigured,
+} from "@/lib/cloud-storage";
 import { NextRequest, NextResponse } from "next/server";
 
 const USDZ_MIME = "model/vnd.usdz+zip";
 
-function getConfig() {
+function getGitHubConfig() {
   const repo = process.env.GITHUB_REPO ?? "hamzashaebi/sharingAR";
   const path = process.env.GITHUB_PATH ?? "models";
   const branch = process.env.GITHUB_BRANCH ?? "main";
@@ -22,7 +26,22 @@ export async function GET(
     );
   }
 
-  const { repo, path: repoPath, branch } = getConfig();
+  if (isCloudStorageConfigured()) {
+    try {
+      const { body, contentLength } = await getObjectFromCloudStorage(filename);
+      const headers = new Headers({
+        "Content-Type": USDZ_MIME,
+        "Cache-Control": "public, max-age=3600",
+      });
+      if (contentLength != null) headers.set("Content-Length", String(contentLength));
+      return new NextResponse(body, { status: 200, headers });
+    } catch (err) {
+      console.error("Cloud storage fetch error:", err);
+      return new NextResponse("Not found", { status: 404 });
+    }
+  }
+
+  const { repo, path: repoPath, branch } = getGitHubConfig();
   const [owner, repoName] = repo.split("/");
   if (!owner || !repoName) {
     return NextResponse.json(
@@ -50,7 +69,6 @@ export async function GET(
       });
     }
 
-    const contentType = res.headers.get("content-type") ?? USDZ_MIME;
     const contentLength = res.headers.get("content-length");
 
     const headers = new Headers({
