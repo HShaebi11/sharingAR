@@ -1,30 +1,23 @@
 import ModelCard from "./ModelCard";
-
-import { listModelsR2 } from "@/lib/storage-r2";
-
-// ... (keep GITHUB config functions if we want to fallback, but for now we replace for R2)
+import { listModelsBlob, ModelItem } from "@/lib/storage-blob";
 
 export default async function Home() {
-  // const { repo } = getGitHubConfig();
-  // const repoUrl = `https://github.com/${repo}`;
-  const repoUrl = "#"; // TODO: Update to R2 dashboard or repo link if relevant
+  const repoUrl = "#";
 
   let error: string | null = null;
-  const privateFiles: string[] = [];
-  const publicFiles: string[] = [];
+  const privateFiles: ModelItem[] = [];
+  const publicFiles: ModelItem[] = [];
 
   try {
     const [privateList, publicList] = await Promise.all([
-      listModelsR2("private"),
-      listModelsR2("public"),
+      listModelsBlob("models/private"),
+      listModelsBlob("models/public"),
     ]);
     privateFiles.push(...privateList);
     publicFiles.push(...publicList);
   } catch (e) {
     console.error(e);
-    // If R2 credentials aren't set, we might show a clearer error or fallback
-    // For now, generic error:
-    error = e instanceof Error ? e.message : "Failed to load models (check R2 config)";
+    error = e instanceof Error ? e.message : "Failed to load models";
   }
 
   return (
@@ -47,15 +40,15 @@ export default async function Home() {
         <p className="folder-desc">View in AR only; no share link.</p>
         {privateFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet. Upload .usdz files to <code>private/</code> in your R2 bucket.
+            No .usdz files yet. Upload .usdz files to <code>models/private/</code> in your Vercel Blob store.
           </p>
         ) : (
           <ul className="grid">
-            {privateFiles.map((filename) => (
-              <li key={filename}>
+            {privateFiles.map((item) => (
+              <li key={item.name}>
                 <ModelCard
-                  name={filename}
-                  proxyUrl={`/api/ar/${filename.split("/").map(encodeURIComponent).join("/")}`}
+                  name={item.name.split("/").pop() || item.name}
+                  proxyUrl={`/api/ar/${item.name}`} // Pass the full pathname (which includes models/private/...)
                   showCopyLink={false}
                 />
               </li>
@@ -69,15 +62,15 @@ export default async function Home() {
         <p className="folder-desc">Shareable link with Copy link.</p>
         {publicFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet. Upload .usdz files to <code>public/</code> in your R2 bucket.
+            No .usdz files yet. Upload .usdz files to <code>models/public/</code> in your Vercel Blob store.
           </p>
         ) : (
           <ul className="grid">
-            {publicFiles.map((filename) => (
-              <li key={filename}>
+            {publicFiles.map((item) => (
+              <li key={item.name}>
                 <ModelCard
-                  name={filename}
-                  proxyUrl={`/api/ar/${filename.split("/").map(encodeURIComponent).join("/")}`}
+                  name={item.name.split("/").pop() || item.name}
+                  proxyUrl={`/api/ar/${item.name}`}
                   showCopyLink={true}
                 />
               </li>
