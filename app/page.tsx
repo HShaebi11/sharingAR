@@ -1,5 +1,4 @@
 import ModelCard from "./ModelCard";
-import RefreshModelsButton from "./RefreshModelsButton";
 
 const GITHUB_API = "https://api.github.com";
 const FOLDERS = ["private", "public"] as const;
@@ -74,7 +73,6 @@ export default async function Home() {
           <code>models/public</code> (public = shareable link). Open on iOS Safari
           to view in AR.
         </p>
-        <RefreshModelsButton />
       </header>
 
       {error && (
