@@ -5,9 +5,10 @@ A web tool to share `.usdz` models with **View in AR** (Apple AR Quick Look). Pu
 ## How it works
 
 1. Create two folders in the repo: `models/private` and `models/public`.
-2. Add `.usdz` files to either folder: **upload** them on the site (if `GITHUB_TOKEN` with `contents: write` is set), or add files locally and push to GitHub.
-3. Open the deployed site; the app lists Private and Public sections via the GitHub API.
-4. On iOS Safari, tap **View in AR** to open Apple AR Quick Look. On other devices, use **Download .usdz**.
+2. Add `.usdz` files to either folder (private = view only, no share link; public = shareable link).
+3. Push to GitHub.
+4. Open the deployed site; the app lists Private and Public sections via the GitHub API.
+5. On iOS Safari, tap **View in AR** to open Apple AR Quick Look. On other devices, use **Download .usdz**.
 
 ### Private and public folders
 
@@ -17,10 +18,6 @@ A web tool to share `.usdz` models with **View in AR** (Apple AR Quick Look). Pu
 To create the folders: in your repo add a file at `models/private/.gitkeep` and `models/public/.gitkeep`, or add a `.usdz` file directly to `models/private/` or `models/public/`.
 
 The app uses a small proxy so USDZ files are served with the correct MIME type (`model/vnd.usdz+zip`) required by Safari for AR Quick Look. GitHub’s raw URLs don’t send that header, so the proxy fetches from GitHub and re-serves the file with the right `Content-Type`.
-
-### Upload to GitHub
-
-If you set `GITHUB_TOKEN` with **contents: read** and **contents: write**, the site shows an **Upload .usdz** form. Choose a `.usdz` file, pick Private or Public, and click **Upload to GitHub**; the file is committed to the repo and appears in the list after refresh.
 
 ## Setup
 
@@ -96,7 +93,7 @@ Before or right after the first deploy:
 | `GITHUB_REPO` | `hamzashaebi/sharingAR` | Use `owner/repo` for your fork if different. |
 | `GITHUB_PATH` | `models` | Path inside the repo where .usdz files live. |
 | `GITHUB_BRANCH` | `main` | Branch used for raw file URLs. |
-| `GITHUB_TOKEN` | *(optional)* | For higher API rate limits use `contents: read`. For **Upload to GitHub** on the site, the token must also have `contents: write`. |
+| `GITHUB_TOKEN` | *(optional)* | Only if you need higher GitHub API rate limits; create a fine-grained or classic token with `contents: read`. |
 
 If you add or change env vars after the first deploy, trigger a new deploy (step 3) so they take effect.
 
