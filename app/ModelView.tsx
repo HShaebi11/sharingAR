@@ -7,9 +7,11 @@ const PLACEHOLDER_SRC = "/ar-placeholder.svg";
 export default function ModelView({
   name,
   proxyUrl,
+  showShareActions = true,
 }: {
   name: string;
   proxyUrl: string;
+  showShareActions?: boolean;
 }) {
   const [supportsAR, setSupportsAR] = useState<boolean | null>(null);
   const [copied, setCopied] = useState(false);
@@ -68,7 +70,7 @@ export default function ModelView({
           </a>
         )}
       </div>
-      {!isShareMode && (
+      {showShareActions && !isShareMode && (
         <div className="model-view-actions">
           <button type="button" onClick={copyLink} className="copy-link-btn">
             {copied ? "Copied!" : "Copy link"}

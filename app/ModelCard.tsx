@@ -12,9 +12,11 @@ function modelPagePath(filename: string): string {
 export default function ModelCard({
   name,
   proxyUrl,
+  showCopyLink = true,
 }: {
   name: string;
   proxyUrl: string;
+  showCopyLink?: boolean;
 }) {
   const [supportsAR, setSupportsAR] = useState<boolean | null>(null);
   const [copied, setCopied] = useState(false);
@@ -59,9 +61,11 @@ export default function ModelCard({
           </span>
         </a>
       )}
-      <button type="button" onClick={copyLink} className="copy-link-btn card-copy">
-        {copied ? "Copied!" : "Copy link"}
-      </button>
+      {showCopyLink && (
+        <button type="button" onClick={copyLink} className="copy-link-btn card-copy">
+          {copied ? "Copied!" : "Copy link"}
+        </button>
+      )}
     </article>
   );
 }

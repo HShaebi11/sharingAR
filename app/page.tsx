@@ -1,6 +1,7 @@
 import ModelCard from "./ModelCard";
 
 const GITHUB_API = "https://api.github.com";
+const FOLDERS = ["private", "public"] as const;
 
 function getConfig() {
   const repo = process.env.GITHUB_REPO ?? "hamzashaebi/sharingAR";
@@ -15,10 +16,10 @@ type GitHubContentItem = {
   path: string;
 };
 
-async function listUsdzFiles(): Promise<string[]> {
+async function listUsdzFilesIn(subpath: string): Promise<string[]> {
   const { repo, path } = getConfig();
   const token = process.env.GITHUB_TOKEN;
-  const url = `${GITHUB_API}/repos/${repo}/contents/${path}`;
+  const url = `${GITHUB_API}/repos/${repo}/contents/${path}/${subpath}`;
   const res = await fetch(url, {
     next: { revalidate: 60 },
     headers: token
@@ -27,13 +28,7 @@ async function listUsdzFiles(): Promise<string[]> {
   });
 
   if (!res.ok) {
-    if (res.status === 404) {
-      throw new Error(
-        `Repository or path not found (GitHub 404). Tried: ${repo}, ${path}. ` +
-          "Set GITHUB_REPO in Vercel to your repo (e.g. your-username/sharingAR). " +
-          "If the repo is private, add GITHUB_TOKEN. Ensure the models/ folder exists and is pushed, then redeploy."
-      );
-    }
+    if (res.status === 404) return [];
     if (res.status === 403) {
       throw new Error(
         "Access denied. If the repo is private, add GITHUB_TOKEN in Vercel."
@@ -47,16 +42,24 @@ async function listUsdzFiles(): Promise<string[]> {
 
   return data
     .filter((item) => item.type === "file" && item.name.toLowerCase().endsWith(".usdz"))
-    .map((item) => item.name)
+    .map((item) => `${subpath}/${item.name}`)
     .sort();
 }
 
 export default async function Home() {
-  let files: string[] = [];
+  const { repo } = getConfig();
+  const repoUrl = `https://github.com/${repo}`;
   let error: string | null = null;
+  const privateFiles: string[] = [];
+  const publicFiles: string[] = [];
 
   try {
-    files = await listUsdzFiles();
+    const [privateList, publicList] = await Promise.all([
+      listUsdzFilesIn("private"),
+      listUsdzFilesIn("public"),
+    ]);
+    privateFiles.push(...privateList);
+    publicFiles.push(...publicList);
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load models";
   }
@@ -66,8 +69,9 @@ export default async function Home() {
       <header className="header">
         <h1 className="title">Sharing AR</h1>
         <p className="subtitle">
-          Drop .usdz files into the <code>models/</code> folder, push to GitHub;
-          they appear here. Open on iOS Safari to view in AR.
+          Put .usdz files in <code>models/private</code> or{" "}
+          <code>models/public</code> (public = shareable link). Open on iOS Safari
+          to view in AR.
         </p>
       </header>
 
@@ -77,20 +81,57 @@ export default async function Home() {
         </div>
       )}
 
-      {files.length === 0 && !error && (
-        <p className="empty">No .usdz files in the models folder yet.</p>
-      )}
+      <section className="folder-section">
+        <h2 className="folder-title">Private</h2>
+        <p className="folder-desc">View in AR only; no share link.</p>
+        {privateFiles.length === 0 ? (
+          <p className="empty">
+            No .usdz files yet.{" "}
+            <a href={repoUrl} target="_blank" rel="noopener noreferrer">
+              Create <code>models/private</code>
+            </a>{" "}
+            in your repo and add .usdz files.
+          </p>
+        ) : (
+          <ul className="grid">
+            {privateFiles.map((filename) => (
+              <li key={filename}>
+                <ModelCard
+                  name={filename}
+                  proxyUrl={`/api/ar/${filename.split("/").map(encodeURIComponent).join("/")}`}
+                  showCopyLink={false}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
-      <ul className="grid">
-        {files.map((filename) => (
-          <li key={filename}>
-            <ModelCard
-              name={filename}
-              proxyUrl={`/api/ar/${filename.split("/").map(encodeURIComponent).join("/")}`}
-            />
-          </li>
-        ))}
-      </ul>
+      <section className="folder-section">
+        <h2 className="folder-title">Public</h2>
+        <p className="folder-desc">Shareable link with Copy link.</p>
+        {publicFiles.length === 0 ? (
+          <p className="empty">
+            No .usdz files yet.{" "}
+            <a href={repoUrl} target="_blank" rel="noopener noreferrer">
+              Create <code>models/public</code>
+            </a>{" "}
+            in your repo and add .usdz files.
+          </p>
+        ) : (
+          <ul className="grid">
+            {publicFiles.map((filename) => (
+              <li key={filename}>
+                <ModelCard
+                  name={filename}
+                  proxyUrl={`/api/ar/${filename.split("/").map(encodeURIComponent).join("/")}`}
+                  showCopyLink={true}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </main>
   );
 }

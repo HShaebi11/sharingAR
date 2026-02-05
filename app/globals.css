@@ -60,6 +60,30 @@ a {
   color: #71717a;
   font-size: 0.9375rem;
 }
+.empty a {
+  color: #a1a1aa;
+  text-decoration: underline;
+}
+.empty a:hover {
+  color: #e4e4e7;
+}
+
+.folder-section {
+  margin-bottom: 2.5rem;
+}
+.folder-section:last-child {
+  margin-bottom: 0;
+}
+.folder-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.folder-desc {
+  color: #71717a;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
 
 .grid {
   list-style: none;

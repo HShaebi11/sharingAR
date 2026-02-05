@@ -28,6 +28,7 @@ export default async function ModelPage({ params }: Props) {
   }
   const proxyUrl = `/api/ar/${encodePath(filename)}`;
   const displayName = filename.replace(/\.usdz$/i, "");
+  const isPrivate = pathSegments[0] === "private";
 
   return (
     <main className="main model-page">
@@ -35,7 +36,7 @@ export default async function ModelPage({ params }: Props) {
         <h1 className="title">{displayName}</h1>
         <p className="subtitle">Open on iOS Safari to view in AR.</p>
       </header>
-      <ModelView name={filename} proxyUrl={proxyUrl} />
+      <ModelView name={filename} proxyUrl={proxyUrl} showShareActions={!isPrivate} />
     </main>
   );
 }

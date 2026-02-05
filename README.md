@@ -1,13 +1,21 @@
 # Sharing AR
 
-A web tool to share `.usdz` models with **View in AR** (Apple AR Quick Look). Drop `.usdz` files into the `models/` folder, push to GitHub, and they appear on the site. Open on iOS Safari to view in AR.
+A web tool to share `.usdz` models with **View in AR** (Apple AR Quick Look). Put `.usdz` files in **private** or **public** folders under `models/`, push to GitHub, and they appear on the site. Open on iOS Safari to view in AR.
 
 ## How it works
 
-1. Add `.usdz` files to the `models/` folder in this repo.
-2. Push to GitHub.
-3. Open the deployed site; the app lists all `.usdz` files from that folder via the GitHub API.
-4. On iOS Safari, tap **View in AR** to open Apple AR Quick Look. On other devices, use **Download .usdz**.
+1. Create two folders in the repo: `models/private` and `models/public`.
+2. Add `.usdz` files to either folder (private = view only, no share link; public = shareable link).
+3. Push to GitHub.
+4. Open the deployed site; the app lists Private and Public sections via the GitHub API.
+5. On iOS Safari, tap **View in AR** to open Apple AR Quick Look. On other devices, use **Download .usdz**.
+
+### Private and public folders
+
+- **Private** – Models in `models/private/` appear in the Private section. View in AR and download only; no Copy link or Share.
+- **Public** – Models in `models/public/` appear in the Public section. Each has a Copy link that produces a shareable URL (with `?share=<id>`). Recipients see only the model and View in AR.
+
+To create the folders: in your repo add a file at `models/private/.gitkeep` and `models/public/.gitkeep`, or add a `.usdz` file directly to `models/private/` or `models/public/`.
 
 The app uses a small proxy so USDZ files are served with the correct MIME type (`model/vnd.usdz+zip`) required by Safari for AR Quick Look. GitHub’s raw URLs don’t send that header, so the proxy fetches from GitHub and re-serves the file with the right `Content-Type`.
 
@@ -44,7 +52,7 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
 
 ### Auto-commit models
 
-After dropping new `.usdz` files into `models/`, you can commit and push them in one step:
+After dropping new `.usdz` files into `models/private/` or `models/public/`, you can commit and push them in one step:
 
 ```bash
 npm run commit-models
