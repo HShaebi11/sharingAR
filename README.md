@@ -47,6 +47,53 @@ Add to `.env.local`:
 
 On Vercel, add the same variables in **Project → Settings → Environment Variables**.
 
+#### Using Cloudflare CLI (Wrangler) to connect to your R2 bucket
+
+1. **Install Wrangler** (Cloudflare CLI):
+
+   ```bash
+   npm install -g wrangler
+   # or use without installing: npx wrangler
+   ```
+
+2. **Log in to Cloudflare** (opens browser):
+
+   ```bash
+   wrangler login
+   ```
+
+3. **List your R2 buckets**:
+
+   ```bash
+   wrangler r2 bucket list
+   ```
+
+4. **Work with a specific bucket** (replace `YOUR_BUCKET_NAME` with your bucket name from `.env.local`):
+
+   ```bash
+   # List objects in the bucket
+   wrangler r2 object list YOUR_BUCKET_NAME
+
+   # List objects under your S3_PREFIX (e.g. view-byhamza-xyz/models)
+   wrangler r2 object list YOUR_BUCKET_NAME --prefix "view-byhamza-xyz/models/"
+
+   # Upload a file
+   wrangler r2 object put YOUR_BUCKET_NAME/view-byhamza-xyz/models/public/my-model.usdz --file=./my-model.usdz
+
+   # Download a file
+   wrangler r2 object get YOUR_BUCKET_NAME/view-byhamza-xyz/models/public/my-model.usdz --file=./downloaded.usdz
+   ```
+
+   Use the same bucket name as `S3_BUCKET` in `.env.local` and the same path prefix as `S3_PREFIX` (e.g. `view-byhamza-xyz/models`) for paths.
+
+5. **Create a bucket** (if you don’t have one yet):
+
+   ```bash
+   wrangler r2 bucket create YOUR_BUCKET_NAME
+   ```
+
+After creating the bucket, set `S3_BUCKET=YOUR_BUCKET_NAME` in `.env.local` and create R2 API credentials in the dashboard (R2 → Manage R2 API Tokens) for the app’s S3 client.
+
 #### Other S3-compatible (AWS S3, MinIO)
 
 | Env var | Description |
