@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props) {
   if (!filename || !filename.toLowerCase().endsWith(".usdz")) {
     return { title: "Not found – Sharing AR" };
   }
-  const displayName = filename.replace(/\.usdz$/i, "");
+  const displayName = (filename.split("/").pop() ?? filename).replace(/\.usdz$/i, "");
   return {
     title: `View ${displayName} in AR – Sharing AR`,
     description: `View ${displayName} in augmented reality with Apple AR Quick Look.`,
@@ -27,7 +27,7 @@ export default async function ModelPage({ params }: Props) {
     notFound();
   }
   const proxyUrl = `/api/ar/${encodePath(filename)}`;
-  const displayName = filename.replace(/\.usdz$/i, "");
+  const displayName = (filename.split("/").pop() ?? filename).replace(/\.usdz$/i, "");
   const isPrivate = pathSegments[0] === "private";
 
   return (

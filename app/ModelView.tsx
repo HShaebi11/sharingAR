@@ -26,7 +26,8 @@ export default function ModelView({
     }
   }, []);
 
-  const displayName = name.replace(/\.usdz$/i, "");
+  const fileName = name.split("/").pop() ?? name;
+  const displayName = fileName.replace(/\.usdz$/i, "");
 
   const copyLink = () => {
     if (typeof window === "undefined") return;
@@ -62,7 +63,7 @@ export default function ModelView({
             <span className="ar-label">View in AR</span>
           </a>
         ) : (
-          <a href={proxyUrl} download={name} className="download-link">
+          <a href={proxyUrl} download={fileName} className="download-link">
             <img src={PLACEHOLDER_SRC} alt="3D model" width={160} height={160} />
             <span className="ar-label">
               {supportsAR === false ? "Download .usdz" : "Open / Download"}

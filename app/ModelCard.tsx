@@ -26,7 +26,8 @@ export default function ModelCard({
     setSupportsAR(a.relList.supports("ar"));
   }, []);
 
-  const displayName = name.replace(/\.usdz$/i, "");
+  const fileName = name.split("/").pop() ?? name;
+  const displayName = fileName.replace(/\.usdz$/i, "");
   const modelPath = modelPagePath(name);
 
   const copyLink = (e: React.MouseEvent) => {
@@ -54,7 +55,7 @@ export default function ModelCard({
           <span className="ar-label">View in AR</span>
         </a>
       ) : (
-        <a href={proxyUrl} download={name} className="download-link">
+        <a href={proxyUrl} download={fileName} className="download-link">
           <img src={PLACEHOLDER_SRC} alt="3D model" width={120} height={120} />
           <span className="ar-label">
             {supportsAR === false ? "Download .usdz" : "Open / Download"}
