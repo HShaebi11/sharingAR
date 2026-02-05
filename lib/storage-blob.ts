@@ -12,15 +12,23 @@ export type ModelItem = {
  */
 export async function listModelsBlob(prefix: string): Promise<ModelItem[]> {
     try {
+        // Determine the full prefix to list. 
+        // If the folder structure is 'view-byhamza-xyz/models/...', we need to list that.
+        // If 'prefix' passed is just 'models/public', we prepend the root.
+
+        // Check if we already have the root or not.
+        const root = "view-byhamza-xyz/";
+        const searchPrefix = prefix.startsWith(root) ? prefix : `${root}${prefix}`;
+
         const { blobs } = await list({
-            prefix: prefix + "/", // Ensure generated prefix has trailing slash
+            prefix: searchPrefix.endsWith("/") ? searchPrefix : `${searchPrefix}/`,
             limit: 100,
         });
 
         return blobs
             .filter((blob) => blob.pathname.toLowerCase().endsWith(".usdz"))
             .map((blob) => ({
-                name: blob.pathname, // Full pathname, e.g. "models/public/foo.usdz"
+                name: blob.pathname, // This will be full path 'view-byhamza-xyz/models/...'
                 url: blob.url,
             }))
             .sort((a, b) => a.name.localeCompare(b.name));

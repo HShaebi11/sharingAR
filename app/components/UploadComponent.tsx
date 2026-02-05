@@ -1,5 +1,6 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
@@ -17,17 +18,14 @@ export default function UploadComponent() {
 
         setIsUploading(true);
         try {
-            const res = await fetch(
-                `/api/upload?filename=${encodeURIComponent(file.name)}&folder=${folder}`,
-                {
-                    method: "POST",
-                    body: file,
-                }
-            );
+            // Client-side upload
+            const newBlob = await upload(file.name, file, {
+                access: "public",
+                handleUploadUrl: "/api/upload",
+                clientPayload: JSON.stringify({ folder }), // Send folder info to server for path construction
+            });
 
-            if (!res.ok) {
-                throw new Error("Upload failed");
-            }
+            console.log("Uploaded:", newBlob.url);
 
             setFile(null);
             setIsOpen(false);

@@ -44,7 +44,7 @@ export default async function Home() {
         <p className="folder-desc">View in AR only; no share link.</p>
         {privateFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet. Upload .usdz files to <code>models/private/</code> in your Vercel Blob store.
+            No .usdz files yet. Upload .usdz files to <code>view-byhamza-xyz/models/private/</code> in your Vercel Blob store.
           </p>
         ) : (
           <ul className="grid">
@@ -66,7 +66,7 @@ export default async function Home() {
         <p className="folder-desc">Shareable link with Copy link.</p>
         {publicFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet. Upload .usdz files to <code>models/public/</code> in your Vercel Blob store.
+            No .usdz files yet. Upload .usdz files to <code>view-byhamza-xyz/models/public/</code> in your Vercel Blob store.
           </p>
         ) : (
           <ul className="grid">
