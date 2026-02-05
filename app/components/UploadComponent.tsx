@@ -104,6 +104,12 @@ export default function UploadComponent() {
                                 Public
                             </label>
                         </div>
+                        {file && (
+                            <p className="path-preview">
+                                Destination: <br />
+                                <code>view-byhamza-xyz/models/{folder}/{file.name}</code>
+                            </p>
+                        )}
                     </div>
 
                     <button
