@@ -40,6 +40,26 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
 
    Open [http://localhost:3000](http://localhost:3000).
 
+## Scripts
+
+### Auto-commit models
+
+After dropping new `.usdz` files into `models/`, you can commit and push them in one step:
+
+```bash
+npm run commit-models
+```
+
+This stages `models/`, commits with message "Add/update .usdz models", and pushes. Only paths under `models/` are staged.
+
+To auto-commit whenever `models/` changes, run the watcher in a terminal and leave it running:
+
+```bash
+npm run watch-models
+```
+
+Changes in `models/` (add or edit `.usdz`) are debounced (2 seconds); then the same commit-and-push logic runs. Press Ctrl+C to stop.
+
 ## Deploy
 
 Deploy to [Vercel](https://vercel.com) (or any host that supports Next.js API routes).
