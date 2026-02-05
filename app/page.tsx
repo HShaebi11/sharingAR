@@ -1,62 +1,24 @@
 import ModelCard from "./ModelCard";
+import { getStorage } from "@/lib/storage";
 
-const GITHUB_API = "https://api.github.com";
 const FOLDERS = ["private", "public"] as const;
 
-function getConfig() {
+function getRepoUrl(): string {
   const repo = process.env.GITHUB_REPO ?? "hamzashaebi/sharingAR";
-  const path = process.env.GITHUB_PATH ?? "models";
-  const branch = process.env.GITHUB_BRANCH ?? "main";
-  return { repo, path, branch };
-}
-
-type GitHubContentItem = {
-  name: string;
-  type: string;
-  path: string;
-};
-
-async function listUsdzFilesIn(subpath: string): Promise<string[]> {
-  const { repo, path } = getConfig();
-  const token = process.env.GITHUB_TOKEN;
-  const url = `${GITHUB_API}/repos/${repo}/contents/${path}/${subpath}`;
-  const res = await fetch(url, {
-    next: { revalidate: 60 },
-    headers: token
-      ? { Authorization: `Bearer ${token}`, Accept: "application/vnd.github.v3+json" }
-      : { Accept: "application/vnd.github.v3+json" },
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) return [];
-    if (res.status === 403) {
-      throw new Error(
-        "Access denied. If the repo is private, add GITHUB_TOKEN in Vercel."
-      );
-    }
-    throw new Error(`GitHub API error: ${res.status}`);
-  }
-
-  const data = (await res.json()) as GitHubContentItem[];
-  if (!Array.isArray(data)) return [];
-
-  return data
-    .filter((item) => item.type === "file" && item.name.toLowerCase().endsWith(".usdz"))
-    .map((item) => `${subpath}/${item.name}`)
-    .sort();
+  return `https://github.com/${repo}`;
 }
 
 export default async function Home() {
-  const { repo } = getConfig();
-  const repoUrl = `https://github.com/${repo}`;
+  const repoUrl = getRepoUrl();
   let error: string | null = null;
   const privateFiles: string[] = [];
   const publicFiles: string[] = [];
 
   try {
+    const storage = getStorage();
     const [privateList, publicList] = await Promise.all([
-      listUsdzFilesIn("private"),
-      listUsdzFilesIn("public"),
+      storage.listFiles("private"),
+      storage.listFiles("public"),
     ]);
     privateFiles.push(...privateList);
     publicFiles.push(...publicList);

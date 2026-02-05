@@ -19,6 +19,20 @@ To create the folders: in your repo add a file at `models/private/.gitkeep` and 
 
 The app uses a small proxy so USDZ files are served with the correct MIME type (`model/vnd.usdz+zip`) required by Safari for AR Quick Look. GitHub’s raw URLs don’t send that header, so the proxy fetches from GitHub and re-serves the file with the right `Content-Type`.
 
+### Cloud storage (S3-compatible)
+
+On the **`feature/cloud-storage`** branch you can use **S3-compatible** storage (AWS S3, Cloudflare R2, MinIO) instead of GitHub. Set `STORAGE_PROVIDER=s3` and configure your bucket:
+
+| Env var | Description |
+|--------|-------------|
+| `S3_BUCKET` | Bucket name (required when using S3). |
+| `S3_PREFIX` | Key prefix for .usdz files (default: `models`). Put files under `models/private/` and `models/public/`. |
+| `S3_REGION` | AWS region (default: `auto`; use for R2). |
+| `S3_ENDPOINT` | Custom endpoint (e.g. R2: `https://<account>.r2.cloudflarestorage.com`). |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Credentials (omit for public buckets with IAM/instance role). |
+
+Listing and file serving use the same Private/Public behaviour; only the backend (GitHub vs S3) changes.
+
 ## Setup
 
 1. Clone the repo and install dependencies:
@@ -33,12 +47,14 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
    cp .env.example .env.local
    ```
 
-   Options:
+   Options (GitHub, default):
 
    - `GITHUB_REPO` – `owner/repo` (default: this repo)
    - `GITHUB_PATH` – path inside the repo where `.usdz` files live (default: `models`)
    - `GITHUB_BRANCH` – branch for raw file URLs (default: `main`)
    - `GITHUB_TOKEN` – optional; use for higher GitHub API rate limits
+
+   For S3-compatible storage (see **Cloud storage** above), set `STORAGE_PROVIDER=s3` and the `S3_*` variables from `.env.example`.
 
 3. Run locally:
 
@@ -94,6 +110,8 @@ Before or right after the first deploy:
 | `GITHUB_PATH` | `models` | Path inside the repo where .usdz files live. |
 | `GITHUB_BRANCH` | `main` | Branch used for raw file URLs. |
 | `GITHUB_TOKEN` | *(optional)* | Only if you need higher GitHub API rate limits; create a fine-grained or classic token with `contents: read`. |
+
+When using the **cloud-storage** branch with S3, also set: `STORAGE_PROVIDER=s3`, `S3_BUCKET`, and optionally `S3_PREFIX`, `S3_REGION`, `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`.
 
 If you add or change env vars after the first deploy, trigger a new deploy (step 3) so they take effect.
 

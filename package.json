@@ -11,6 +11,7 @@
     "watch-models": "node scripts/watch-models.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.983.0",
     "next": "^14.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
