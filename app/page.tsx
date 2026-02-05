@@ -1,66 +1,30 @@
 import ModelCard from "./ModelCard";
 
-const GITHUB_API = "https://api.github.com";
+import { listModelsR2 } from "@/lib/storage-r2";
 
-function getGitHubConfig() {
-  const repo = process.env.GITHUB_REPO ?? "hamzashaebi/sharingAR";
-  const path = process.env.GITHUB_PATH ?? "models";
-  const branch = process.env.GITHUB_BRANCH ?? "main";
-  return { repo, path, branch };
-}
-
-type GitHubContentItem = {
-  name: string;
-  type: string;
-  path: string;
-};
-
-async function listUsdzFromGitHub(subpath: string): Promise<string[]> {
-  const { repo, path } = getGitHubConfig();
-  const token = process.env.GITHUB_TOKEN;
-  const url = `${GITHUB_API}/repos/${repo}/contents/${path}/${subpath}`;
-  const res = await fetch(url, {
-    next: { revalidate: 60 },
-    headers: token
-      ? { Authorization: `Bearer ${token}`, Accept: "application/vnd.github.v3+json" }
-      : { Accept: "application/vnd.github.v3+json" },
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) return [];
-    if (res.status === 403) {
-      throw new Error(
-        "Access denied. If the repo is private, add GITHUB_TOKEN in Vercel."
-      );
-    }
-    throw new Error(`GitHub API error: ${res.status}`);
-  }
-
-  const data = (await res.json()) as GitHubContentItem[];
-  if (!Array.isArray(data)) return [];
-
-  return data
-    .filter((item) => item.type === "file" && item.name.toLowerCase().endsWith(".usdz"))
-    .map((item) => `${subpath}/${item.name}`)
-    .sort();
-}
+// ... (keep GITHUB config functions if we want to fallback, but for now we replace for R2)
 
 export default async function Home() {
-  const { repo } = getGitHubConfig();
-  const repoUrl = `https://github.com/${repo}`;
+  // const { repo } = getGitHubConfig();
+  // const repoUrl = `https://github.com/${repo}`;
+  const repoUrl = "#"; // TODO: Update to R2 dashboard or repo link if relevant
+
   let error: string | null = null;
   const privateFiles: string[] = [];
   const publicFiles: string[] = [];
 
   try {
     const [privateList, publicList] = await Promise.all([
-      listUsdzFromGitHub("private"),
-      listUsdzFromGitHub("public"),
+      listModelsR2("private"),
+      listModelsR2("public"),
     ]);
     privateFiles.push(...privateList);
     publicFiles.push(...publicList);
   } catch (e) {
-    error = e instanceof Error ? e.message : "Failed to load models";
+    console.error(e);
+    // If R2 credentials aren't set, we might show a clearer error or fallback
+    // For now, generic error:
+    error = e instanceof Error ? e.message : "Failed to load models (check R2 config)";
   }
 
   return (
@@ -83,7 +47,7 @@ export default async function Home() {
         <p className="folder-desc">View in AR only; no share link.</p>
         {privateFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/private</code></a> in your repo and add .usdz files.
+            No .usdz files yet. Upload .usdz files to <code>private/</code> in your R2 bucket.
           </p>
         ) : (
           <ul className="grid">
@@ -105,7 +69,7 @@ export default async function Home() {
         <p className="folder-desc">Shareable link with Copy link.</p>
         {publicFiles.length === 0 ? (
           <p className="empty">
-            No .usdz files yet. <a href={repoUrl} target="_blank" rel="noopener noreferrer">Create <code>models/public</code></a> in your repo and add .usdz files.
+            No .usdz files yet. Upload .usdz files to <code>public/</code> in your R2 bucket.
           </p>
         ) : (
           <ul className="grid">
