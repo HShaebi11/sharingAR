@@ -31,7 +31,8 @@ export default function ModelCard({
     e.preventDefault();
     e.stopPropagation();
     if (typeof window === "undefined") return;
-    const url = `${window.location.origin}${modelPath}`;
+    const shareId = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+    const url = `${window.location.origin}${modelPath}?share=${shareId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

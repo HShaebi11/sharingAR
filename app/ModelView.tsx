@@ -13,17 +13,25 @@ export default function ModelView({
 }) {
   const [supportsAR, setSupportsAR] = useState<boolean | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isShareMode, setIsShareMode] = useState(false);
 
   useEffect(() => {
     const a = document.createElement("a");
     setSupportsAR(a.relList.supports("ar"));
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setIsShareMode(params.has("share"));
+    }
   }, []);
 
   const displayName = name.replace(/\.usdz$/i, "");
 
   const copyLink = () => {
     if (typeof window === "undefined") return;
-    navigator.clipboard.writeText(window.location.href).then(() => {
+    const shareId = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+    const baseUrl = `${window.location.origin}${window.location.pathname}`;
+    const shareUrl = `${baseUrl}?share=${shareId}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -31,9 +39,12 @@ export default function ModelView({
 
   const share = () => {
     if (typeof window === "undefined" || !navigator.share) return;
+    const shareId = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
+    const baseUrl = `${window.location.origin}${window.location.pathname}`;
+    const shareUrl = `${baseUrl}?share=${shareId}`;
     navigator.share({
       title: `View ${displayName} in AR`,
-      url: window.location.href,
+      url: shareUrl,
       text: `View ${displayName} in AR`,
     });
   };
@@ -57,16 +68,18 @@ export default function ModelView({
           </a>
         )}
       </div>
-      <div className="model-view-actions">
-        <button type="button" onClick={copyLink} className="copy-link-btn">
-          {copied ? "Copied!" : "Copy link"}
-        </button>
-        {canShare && (
-          <button type="button" onClick={share} className="share-btn">
-            Share
+      {!isShareMode && (
+        <div className="model-view-actions">
+          <button type="button" onClick={copyLink} className="copy-link-btn">
+            {copied ? "Copied!" : "Copy link"}
           </button>
-        )}
-      </div>
+          {canShare && (
+            <button type="button" onClick={share} className="share-btn">
+              Share
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
