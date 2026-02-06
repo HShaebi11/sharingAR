@@ -6,11 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "commit-models": "node scripts/commit-models.js",
-    "watch-models": "node scripts/watch-models.js"
+    "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/blob": "^2.2.0",
     "next": "^14.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

@@ -1,25 +1,24 @@
 # Sharing AR
 
-A web tool to share `.usdz` models with **View in AR** (Apple AR Quick Look). Put `.usdz` files in **private** or **public** folders under `models/`, push to GitHub, and they appear on the site. Open on iOS Safari to view in AR.
+A web tool to share `.usdz` models with **View in AR** (Apple AR Quick Look). Upload `.usdz` files to **private** or **public** folders via the web UI, and they appear on the site. Open on iOS Safari to view in AR.
 
 ## How it works
 
-1. Create two folders in the repo: `models/private` and `models/public`.
-2. Add `.usdz` files to either folder (private = view only, no share link; public = shareable link).
-3. Push to GitHub.
-4. Open the deployed site; the app lists Private and Public sections via the GitHub API.
-5. On iOS Safari, tap **View in AR** to open Apple AR Quick Look. On other devices, use **Download .usdz**.
+1. Open the deployed site and use the **Upload Model** form to add `.usdz` files.
+2. Choose **Private** or **Public** before uploading.
+3. Models appear immediately in the Private or Public section.
+4. On iOS Safari, tap **View in AR** to open Apple AR Quick Look. On other devices, use **Download .usdz**.
 
 ### Private and public folders
 
-- **Private** – Models in `models/private/` appear in the Private section. View in AR and download only; no Copy link or Share.
-- **Public** – Models in `models/public/` appear in the Public section. Each has a Copy link that produces a shareable URL (with `?share=<id>`). Recipients see only the model and View in AR.
+- **Private** – View in AR and download only; no Copy link or Share.
+- **Public** – Each model has a Copy link that produces a shareable URL (with `?share=<id>`). Recipients see only the model and View in AR.
 
-To create the folders: in your repo add a file at `models/private/.gitkeep` and `models/public/.gitkeep`, or add a `.usdz` file directly to `models/private/` or `models/public/`.
+The app uses a small proxy so USDZ files are served with the correct MIME type (`model/vnd.usdz+zip`) required by Safari for AR Quick Look.
 
-The app uses a small proxy so USDZ files are served with the correct MIME type (`model/vnd.usdz+zip`) required by Safari for AR Quick Look. GitHub’s raw URLs don’t send that header, so the proxy fetches from GitHub and re-serves the file with the right `Content-Type`.
+### Storage
 
-
+Models are stored in [Vercel Blob Storage](https://vercel.com/docs/storage/vercel-blob) — a globally distributed file store backed by Vercel's CDN. No GitHub API or git workflow is required.
 
 ## Setup
 
@@ -29,7 +28,7 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
    npm install
    ```
 
-2. Copy env example and adjust if needed:
+2. Copy env example and set your Vercel Blob token:
 
    ```bash
    cp .env.example .env.local
@@ -37,10 +36,7 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
 
    Options:
 
-   - `GITHUB_REPO` – `owner/repo` (default: this repo)
-   - `GITHUB_PATH` – path inside the repo where `.usdz` files live (default: `models`)
-   - `GITHUB_BRANCH` – branch for raw file URLs (default: `main`)
-   - `GITHUB_TOKEN` – optional; use for higher GitHub API rate limits
+   - `BLOB_READ_WRITE_TOKEN` – Vercel Blob read/write token (required). Create one via **Vercel Dashboard → Storage → Blob**.
 
 3. Run locally:
 
@@ -50,66 +46,32 @@ The app uses a small proxy so USDZ files are served with the correct MIME type (
 
    Open [http://localhost:3000](http://localhost:3000).
 
-## Scripts
-
-### Auto-commit models
-
-After dropping new `.usdz` files into `models/private/` or `models/public/`, you can commit and push them in one step:
-
-```bash
-npm run commit-models
-```
-
-This stages `models/`, commits with message "Add/update .usdz models", and pushes. Only paths under `models/` are staged.
-
-To auto-commit whenever `models/` changes, run the watcher in a terminal and leave it running:
-
-```bash
-npm run watch-models
-```
-
-Changes in `models/` (add or edit `.usdz`) are debounced (2 seconds); then the same commit-and-push logic runs. Press Ctrl+C to stop.
-
 ## Deploy
 
-Deploy to [Vercel](https://vercel.com) (or any host that supports Next.js API routes).
-
-**[Deploy with Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhamzashaebi%2FsharingAR)** — one-click: connects this repo, then follow steps 2–3 below.
+Deploy to [Vercel](https://vercel.com).
 
 ### 1. Connect this repo to Vercel
 
-- Go to [vercel.com](https://vercel.com) and sign in (use “Continue with GitHub” if you want the repo linked to your GitHub account).
+- Go to [vercel.com](https://vercel.com) and sign in.
 - Click **Add New…** then **Project**.
-- Under “Import Git Repository”, find **sharingAR** (or paste `hamzashaebi/sharingAR` / your fork’s full name). If it’s missing, click **Adjust GitHub App Permissions** and grant Vercel access to the repo, then refresh.
-- Select the **sharingAR** repo and click **Import** (do not change Framework Preset or Root Directory unless you use a monorepo).
+- Import the **sharingAR** repo.
 
-### 2. Set environment variables
+### 2. Add Blob storage
 
-Before or right after the first deploy:
-
-- In the project import screen, expand **Environment Variables**.
-- Add these (for Production, and optionally Preview/Development if you want the same config everywhere):
-
-| Name | Value | Notes |
-|------|--------|-------|
-| `GITHUB_REPO` | `hamzashaebi/sharingAR` | Use `owner/repo` for your fork if different. |
-| `GITHUB_PATH` | `models` | Path inside the repo where .usdz files live. |
-| `GITHUB_BRANCH` | `main` | Branch used for raw file URLs. |
-| `GITHUB_TOKEN` | *(optional)* | Only if you need higher GitHub API rate limits; create a fine-grained or classic token with `contents: read`. |
-
-If you add or change env vars after the first deploy, trigger a new deploy (step 3) so they take effect.
+- In the Vercel project dashboard, go to **Storage** → **Create Database** → choose **Blob**.
+- This automatically adds the `BLOB_READ_WRITE_TOKEN` environment variable to your project.
 
 ### 3. Deploy
 
-- Click **Deploy** (first time) or **Redeploy** (after changing env vars) from the project dashboard.
-- Wait for the build to finish. Vercel will show a **Production** URL (e.g. `https://sharing-ar-xxx.vercel.app`).
-- Open that URL: you should see the Sharing AR listing page. With no .usdz in `models/` you’ll see “No .usdz files in the models folder yet.” Add .usdz files to `models/`, push to GitHub; the list updates on the next page load (listing uses the GitHub API).
+- Click **Deploy** (first time) or **Redeploy** (after changes).
+- Wait for the build to finish. Vercel will show a **Production** URL.
+- Open that URL and use the upload form to add `.usdz` files.
 
 ### Optional: custom domain
 
-In the project: **Settings → Domains** → add your domain and follow Vercel’s DNS instructions.
+In the project: **Settings → Domains** → add your domain and follow Vercel's DNS instructions.
 
 ## Requirements
 
 - **View in AR**: Safari on iOS (or SFSafariViewController). Other browsers get a download link.
-- **USDZ**: Use Apple’s [AR Quick Look](https://developer.apple.com/augmented-reality/quick-look/) format.
+- **USDZ**: Use Apple's [AR Quick Look](https://developer.apple.com/augmented-reality/quick-look/) format.

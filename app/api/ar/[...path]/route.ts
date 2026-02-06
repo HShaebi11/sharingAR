@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { list } from "@vercel/blob";
 
 const USDZ_MIME = "model/vnd.usdz+zip";
-
-function getGitHubConfig() {
-  const repo = process.env.GITHUB_REPO ?? "hamzashaebi/sharingAR";
-  const path = process.env.GITHUB_PATH ?? "models";
-  const branch = process.env.GITHUB_BRANCH ?? "main";
-  return { repo, path, branch };
-}
 
 export async function GET(
   _request: NextRequest,
@@ -22,29 +16,25 @@ export async function GET(
     );
   }
 
-  const { repo, path: repoPath, branch } = getGitHubConfig();
-  const [owner, repoName] = repo.split("/");
-  if (!owner || !repoName) {
-    return NextResponse.json(
-      { error: "Invalid GITHUB_REPO (use owner/repo)" },
-      { status: 500 }
-    );
-  }
-
-  const fullPath = `${repoPath}/${filename}`;
-  const encodedPath = fullPath.split("/").map(encodeURIComponent).join("/");
-  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repoName}/${branch}/${encodedPath}`;
-
   try {
-    const token = process.env.GITHUB_TOKEN;
-    const res = await fetch(rawUrl, {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    // Find the blob by its pathname
+    const result = await list({
+      prefix: filename,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
+    const blob = result.blobs.find(
+      (b) => b.pathname === filename
+    );
+
+    if (!blob) {
+      return new NextResponse("Not found", { status: 404 });
+    }
+
+    // Fetch the file from Vercel Blob CDN
+    const res = await fetch(blob.url);
+
     if (!res.ok) {
-      if (res.status === 404) {
-        return new NextResponse("Not found", { status: 404 });
-      }
       return new NextResponse(`Upstream error: ${res.status}`, {
         status: res.status,
       });
