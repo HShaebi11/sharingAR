@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { getBlobToken } from "@/app/lib/blob";
-import {
-  type BlobFolder,
-  BLOB_FOLDER_PRIVATE,
-  BLOB_FOLDER_PUBLIC,
-  getBlobPath,
-} from "@/app/lib/blob-paths";
 
 const USDZ_MIME = "model/vnd.usdz+zip";
 const MAX_SIZE = 100 * 1024 * 1024; // 100 MB
@@ -35,9 +29,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const targetFolder: BlobFolder =
-      folder === BLOB_FOLDER_PUBLIC ? BLOB_FOLDER_PUBLIC : BLOB_FOLDER_PRIVATE;
-    const pathname = getBlobPath(targetFolder, file.name);
+    const targetFolder = folder === "public" ? "public" : "private";
+    const pathname = `${targetFolder}/${file.name}`;
 
     const blob = await put(pathname, file, {
       access: "public",

@@ -1,10 +1,6 @@
-/** Vercel Blob tokens must start with this prefix. */
-const BLOB_TOKEN_PREFIX = "vercel_blob_rw_";
-
 /**
- * Blob token from env. Trims whitespace, strips surrounding quotes, and removes
- * newlines/control chars so the value matches the pattern Vercel expects (avoids
- * "The string did not match the expected pattern" from the Blob API).
+ * Blob token from env. Trims whitespace and strips surrounding quotes
+ * so Vercel (and other) env vars pasted with quotes work correctly.
  */
 export function getBlobToken(): string | undefined {
   const raw = process.env.BLOB_READ_WRITE_TOKEN;
@@ -42,13 +38,7 @@ export function getBlobToken(): string | undefined {
     (trimmed.startsWith("'") && trimmed.endsWith("'"))
       ? trimmed.slice(1, -1).trim()
       : trimmed;
-  if (unquoted === "") return undefined;
-  // Strip all whitespace and control chars so the token matches Vercel's expected pattern
-  const sanitized = unquoted.replace(/\s+/g, "").replace(/[\x00-\x1f\x7f]/g, "");
-  if (sanitized === "" || !sanitized.startsWith(BLOB_TOKEN_PREFIX)) return undefined;
-  // Reject placeholder from .env.example
-  if (sanitized.endsWith("...")) return undefined;
-  const out = sanitized;
+  const out = unquoted === "" ? undefined : unquoted;
   // #region agent log
   const firstCode = trimmed.length > 0 ? trimmed.charCodeAt(0) : 0;
   const lastCode = trimmed.length > 0 ? trimmed.charCodeAt(trimmed.length - 1) : 0;
