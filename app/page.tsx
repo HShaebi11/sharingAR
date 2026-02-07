@@ -7,18 +7,27 @@ async function listUsdzFromBlob(folder: string): Promise<string[]> {
   const prefix = `${folder}/`;
   const token = getBlobToken();
   // #region agent log
+  const payload = {
+    location: "app/page.tsx:listUsdzFromBlob",
+    message: "before list()",
+    data: { folder, tokenDefined: token != null, tokenLength: token?.length ?? 0 },
+    timestamp: Date.now(),
+    sessionId: "debug-session",
+    hypothesisId: "H4",
+  };
   fetch("http://127.0.0.1:7247/ingest/3472bf24-0680-40cd-92fd-96d67b4de365", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      location: "app/page.tsx:listUsdzFromBlob",
-      message: "before list()",
-      data: { folder, tokenDefined: token != null, tokenLength: token?.length ?? 0 },
-      timestamp: Date.now(),
-      sessionId: "debug-session",
-      hypothesisId: "H4",
-    }),
+    body: JSON.stringify(payload),
   }).catch(() => {});
+  if (typeof process !== "undefined" && process.versions?.node) {
+    try {
+      require("fs").appendFileSync(
+        process.cwd() + "/.cursor/debug.log",
+        JSON.stringify(payload) + "\n"
+      );
+    } catch (_) {}
+  }
   // #endregion
   const result = await list({ prefix, token });
 
