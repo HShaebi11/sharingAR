@@ -1,10 +1,26 @@
 import { list } from "@vercel/blob";
+import { getBlobToken } from "@/app/lib/blob";
 import ModelCard from "./ModelCard";
 import UploadForm from "./UploadForm";
 
 async function listUsdzFromBlob(folder: string): Promise<string[]> {
   const prefix = `${folder}/`;
-  const result = await list({ prefix, token: process.env.BLOB_READ_WRITE_TOKEN });
+  const token = getBlobToken();
+  // #region agent log
+  fetch("http://127.0.0.1:7247/ingest/3472bf24-0680-40cd-92fd-96d67b4de365", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "app/page.tsx:listUsdzFromBlob",
+      message: "before list()",
+      data: { folder, tokenDefined: token != null, tokenLength: token?.length ?? 0 },
+      timestamp: Date.now(),
+      sessionId: "debug-session",
+      hypothesisId: "H4",
+    }),
+  }).catch(() => {});
+  // #endregion
+  const result = await list({ prefix, token });
 
   return result.blobs
     .filter((blob) => blob.pathname.toLowerCase().endsWith(".usdz"))

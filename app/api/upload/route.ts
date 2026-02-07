@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import { getBlobToken } from "@/app/lib/blob";
 
 const USDZ_MIME = "model/vnd.usdz+zip";
 const MAX_SIZE = 100 * 1024 * 1024; // 100 MB
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
       access: "public",
       contentType: USDZ_MIME,
       addRandomSuffix: false,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: getBlobToken(),
     });
 
     return NextResponse.json({

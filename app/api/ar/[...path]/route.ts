@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { list } from "@vercel/blob";
+import { getBlobToken } from "@/app/lib/blob";
 
 const USDZ_MIME = "model/vnd.usdz+zip";
 
@@ -20,7 +21,7 @@ export async function GET(
     // Find the blob by its pathname
     const result = await list({
       prefix: filename,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: getBlobToken(),
     });
 
     const blob = result.blobs.find(
