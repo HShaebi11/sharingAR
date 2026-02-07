@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { list } from "@vercel/blob";
 import { getBlobToken } from "@/app/lib/blob";
+import { isValidBlobPathname } from "@/app/lib/blob-paths";
 
 const USDZ_MIME = "model/vnd.usdz+zip";
 
@@ -9,8 +10,8 @@ export async function GET(
   context: { params: Promise<{ path: string[] }> }
 ) {
   const { path: pathSegments } = await context.params;
-  const filename = pathSegments?.join("/");
-  if (!filename || !filename.toLowerCase().endsWith(".usdz")) {
+  const pathname = pathSegments?.join("/");
+  if (!pathname || !isValidBlobPathname(pathname)) {
     return NextResponse.json(
       { error: "Invalid or missing .usdz path" },
       { status: 400 }
@@ -18,15 +19,13 @@ export async function GET(
   }
 
   try {
-    // Find the blob by its pathname
+    // Find the blob by its pathname (prefix matches this path only)
     const result = await list({
-      prefix: filename,
+      prefix: pathname,
       token: getBlobToken(),
     });
 
-    const blob = result.blobs.find(
-      (b) => b.pathname === filename
-    );
+    const blob = result.blobs.find((b) => b.pathname === pathname);
 
     if (!blob) {
       return new NextResponse("Not found", { status: 404 });

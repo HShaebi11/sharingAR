@@ -1,10 +1,16 @@
 import { list } from "@vercel/blob";
 import { getBlobToken } from "@/app/lib/blob";
+import {
+  type BlobFolder,
+  BLOB_FOLDER_PRIVATE,
+  BLOB_FOLDER_PUBLIC,
+  getListPrefix,
+} from "@/app/lib/blob-paths";
 import ModelCard from "./ModelCard";
 import UploadForm from "./UploadForm";
 
-async function listUsdzFromBlob(folder: string): Promise<string[]> {
-  const prefix = `${folder}/`;
+async function listUsdzFromBlob(folder: BlobFolder): Promise<string[]> {
+  const prefix = getListPrefix(folder);
   const token = getBlobToken();
   // #region agent log
   const payload = {
@@ -46,8 +52,8 @@ export default async function Home() {
 
   try {
     const [privateList, publicList] = await Promise.all([
-      listUsdzFromBlob("private"),
-      listUsdzFromBlob("public"),
+      listUsdzFromBlob(BLOB_FOLDER_PRIVATE),
+      listUsdzFromBlob(BLOB_FOLDER_PUBLIC),
     ]);
     privateFiles.push(...privateList);
     publicFiles.push(...publicList);
